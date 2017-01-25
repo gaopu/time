@@ -1,7 +1,7 @@
 var tabId = 1, windowId = 2;
 
-function set() {
-	document.getElementById("status").innerText = "tabId：" + tabId + " ; " + "windowId：" + windowId;
+function updatePage() {
+	document.getElementById("status").innerText = localStorage.m;
 }
 
-window.addEventListener("load", set, false);
+window.addEventListener("load", updatePage, false);
