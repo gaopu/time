@@ -21,8 +21,7 @@
 	},
 
 	"background": {
-    	"scripts": ["event.js"],
-    	"persistent": false
+    	"scripts": ["event.js"]
 	},
 
 	// 设置页面
