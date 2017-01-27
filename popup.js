@@ -17,7 +17,11 @@ function updatePage() {
             localStorage[windowId] = bg.getStartTimeInfoJsonStr(jsonObj.tabId, jsonObj.domain);
         }
 
-        document.getElementById("status").innerText = localStorage["zhihu.com"];
+        var str = "";
+        for (var i = 0; i < localStorage.length; i++) {
+            str += localStorage.key(i) + " -> " + localStorage.getItem(localStorage.key(i)) + "\n";
+        }
+        document.getElementById("status").innerText = str;
     });
 }
 
