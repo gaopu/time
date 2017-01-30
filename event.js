@@ -11,10 +11,10 @@ function init() {
 chrome.alarms.create("newDay", { when: new Date(new Date().toLocaleDateString()).getTime() + 86400000 });
 // alarm处理程序
 chrome.alarms.onAlarm.addListener(function callback(alarm) {
+    alert("时间到！");
     // 这里把时间统计一下并存储
     // 表示这是由于新的一天到了而触发
     if (alarm.name == "newDay") {
-    	alert("到了新的一天！");
         // 凌晨零点，获取所有window，将这些窗口的计时状态都存储、更新
         chrome.windows.getAll(function callback(windows) {
             for (var i = 0; i < windows.length; i++) {
@@ -32,7 +32,7 @@ chrome.alarms.onAlarm.addListener(function callback(alarm) {
             }
 
             setTodayZero();
-            localStorage["today"] = new Date().toLocaleString();
+            localStorage["today"] = new Date().toLocaleDateString();
             chrome.alarms.create("newDay", { when: new Date(new Date().toLocaleDateString()).getTime() + 86400000 });
         });
     }
@@ -41,6 +41,11 @@ chrome.alarms.onAlarm.addListener(function callback(alarm) {
 chrome.tabs.onActivated.addListener(function callback(activeInfo) {
     chrome.tabs.get(activeInfo.tabId, function callback(tab) {
         var url = tab.url;
+
+        if (url == "" || url == null) {
+            return;
+        }
+
         var tabId = activeInfo.tabId;
         var windowId = activeInfo.windowId;
 
@@ -69,7 +74,7 @@ chrome.tabs.onActivated.addListener(function callback(activeInfo) {
 chrome.windows.onRemoved.addListener(function callback(windowId) {
     saveTime(windowId);
     localStorage.removeItem(windowId);
-    更新windows信息
+    // 更新windows信息
 });
 
 // 当tab更新时提醒，检测是否url改变了，改变了就存储上一个网站的计时
