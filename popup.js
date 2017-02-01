@@ -1,6 +1,9 @@
 var bg = chrome.extension.getBackgroundPage();
 
 function updatePage() {
+	// 这个数组存储已经计算过存储时间的domain，第二次再碰到就不计算了
+	var saved = [];
+
     //点击插件时，全部激活tab的访问时间都更新
     chrome.windows.getAll(function callback(windows) {
         for (var i = 0; i < windows.length; i++) {
@@ -10,11 +13,19 @@ function updatePage() {
                 continue;
             }
 
-            bg.saveTime(windowId);
+            var domain = JSON.parse(localStorage[windowId]).domain;
+            var notSave = saved.every(function(item, index, array) {
+            	// 还没存储过访问时间
+            	if (domain != item) {
+            		return true;
+            	}
+            	return false;
+            });
 
-            // 更新start时间到现在
-            var jsonObj = JSON.parse(localStorage[windowId]);
-            localStorage[windowId] = bg.getStartTimeInfoJsonStr(jsonObj.tabId, jsonObj.domain);
+            if (notSave) {
+            	bg.saveTime(windowId);
+            	saved = saved.concat(domain);
+            }
         }
 
         var str = "";

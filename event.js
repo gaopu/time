@@ -5,13 +5,18 @@ function init() {
     if (localStorage["today"] == null) {
         localStorage["today"] = new Date().toLocaleDateString();
     }
+
+    // "today"属性不是今天的日期
+    // 即每日第一次使用插件时，设置每个网站的"today"属性为"0"
+    if (localStorage["today"] != new Date().toLocaleDateString()) {
+        setTodayZero();
+    }
 }
 
 // 设置定时器，在第二天凌晨零点触发
 chrome.alarms.create("newDay", { when: new Date(new Date().toLocaleDateString()).getTime() + 86400000 });
 // alarm处理程序
 chrome.alarms.onAlarm.addListener(function callback(alarm) {
-    alert("时间到！");
     // 这里把时间统计一下并存储
     // 表示这是由于新的一天到了而触发
     if (alarm.name == "newDay") {
@@ -25,10 +30,6 @@ chrome.alarms.onAlarm.addListener(function callback(alarm) {
                 }
 
                 saveTime(windowId);
-
-                // 更新start时间到现在
-                var jsonObj = JSON.parse(localStorage[windowId]);
-                localStorage[windowId] = getStartTimeInfoJsonStr(jsonObj.tabId, jsonObj.domain);
             }
 
             setTodayZero();
@@ -55,7 +56,7 @@ chrome.tabs.onActivated.addListener(function callback(activeInfo) {
         }
 
         // 进入Chrome的内置页面，就不用计时了，停止计时状态
-        if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://") {
+        if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://" || url.substring(0, 7) === "file://") {
             localStorage.removeItem(windowId);
             return;
         }
@@ -74,7 +75,6 @@ chrome.tabs.onActivated.addListener(function callback(activeInfo) {
 chrome.windows.onRemoved.addListener(function callback(windowId) {
     saveTime(windowId);
     localStorage.removeItem(windowId);
-    // 更新windows信息
 });
 
 // 当tab更新时提醒，检测是否url改变了，改变了就存储上一个网站的计时
@@ -86,7 +86,7 @@ chrome.tabs.onUpdated.addListener(function callback(tabId, changeInfo, tab) {
 
     // url改变了
     if (changeInfo.url != null) {
-        if (changeInfo.url.substring(0, 9) === "chrome://" || changeInfo.url.substring(0, 19) === "chrome-extension://") {
+        if (changeInfo.url.substring(0, 9) === "chrome://" || changeInfo.url.substring(0, 19) === "chrome-extension://" || changeInfo.url.substring(0, 7) === "file://") {
             return;
         }
 
@@ -97,7 +97,40 @@ chrome.tabs.onUpdated.addListener(function callback(tabId, changeInfo, tab) {
 
 // 开始计时
 function startTimer(windowId, tabId, url) {
-    localStorage[windowId] = getStartTimeInfoJsonStr(tabId, extractDomain(url));
+    var domain = extractDomain(url);
+    // 此处同时处理了"多个window同时计时同一个网站"的情况
+    // 计时开始时：保存一个相同网站的时间，然后将所有同一网站的计时start设置为同一时间
+    chrome.windows.getAll(function callback(windows) {
+        // 保存一个相同网站的时间
+        for (var i = 0; i < windows.length; i++) {
+            var wId = windows[i].id;
+
+            if (localStorage[wId] == null) {
+                continue;
+            }
+
+            if (JSON.parse(localStorage[wId]).domain == domain) {
+                saveTime(wId);
+                break;
+            }
+        }
+        // 将所有同一网站的计时start设置为同一时间
+        var start = Date.now();
+        for (var i = 0; i < windows.length; i++) {
+            var wId = windows[i].id;
+
+            if (localStorage[wId] == null) {
+                continue;
+            }
+
+            var obj = JSON.parse(localStorage[wId]);
+            if (obj.domain == domain) {
+                localStorage[wId] = getStartTimeInfoJsonStr(obj.tabId, domain, start);
+            }
+        }
+
+        localStorage[windowId] = getStartTimeInfoJsonStr(tabId, domain, start);
+    });
 }
 
 // 存储网站的访问时间
@@ -105,11 +138,43 @@ function saveTime(windowId) {
     // 这个window有计时信息
     if (localStorage[windowId] != null) {
         var jsonObj = JSON.parse(localStorage[windowId]);
-        var jsonStr = getSaveJsonStr(jsonObj.domain, jsonObj.start);
+        var domain = jsonObj.domain;
 
-        if (jsonStr != null) {
-            localStorage[jsonObj.domain] = jsonStr;
-        }
+        // 此处同时处理了"多个window同时计时同一个网站"的情况
+        // 计时结束时：保存一个相同的网站的时间，修改所有相同的网站的start为同一时间
+        chrome.windows.getAll(function callback(windows) {
+            // 保存一个相同网站的时间
+            for (var i = 0; i < windows.length; i++) {
+                var wId = windows[i].id;
+
+                if (localStorage[wId] == null) {
+                    continue;
+                }
+
+                if (JSON.parse(localStorage[wId]).domain == domain) {
+                    var jsonStr = getSaveJsonStr(jsonObj.domain, jsonObj.start);
+
+                    if (jsonStr != null) {
+                        localStorage[jsonObj.domain] = jsonStr;
+                    }
+                    break;
+                }
+            }
+            // 将所有同一网站的计时start设置为同一时间
+            var start = Date.now();
+            for (var i = 0; i < windows.length; i++) {
+                var wId = windows[i].id;
+
+                if (localStorage[wId] == null) {
+                    continue;
+                }
+
+                var obj = JSON.parse(localStorage[wId]);
+                if (obj.domain == domain) {
+                    localStorage[wId] = getStartTimeInfoJsonStr(obj.tabId, domain, start);
+                }
+            }
+        });
     }
 }
 
@@ -169,8 +234,8 @@ function setTodayZero() {
 // tabId 某个在window最前端的tab的Id
 // domain 这个tab的网站域名
 // start 开始计时的时间戳，13位
-function getStartTimeInfoJsonStr(tabId, domain) {
-    return '{"tabId":' + tabId + ',"domain":"' + domain + '","start":' + Date.now() + '}';
+function getStartTimeInfoJsonStr(tabId, domain, start = Date.now()) {
+    return '{"tabId":' + tabId + ',"domain":"' + domain + '","start":' + start + '}';
 }
 
 // 返回根据url求出的域名
