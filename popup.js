@@ -8,7 +8,10 @@ var option = {
     },
     tooltip: {
         trigger: 'item',
-        formatter: "{b}<br/>{c} ({d}%)"
+        formatter: function(params, ticket, callback) {
+            var tip = params.name + "<br/>" + secondsToTimeStr(params.value) + "(" + params.percent + "%)";
+            return tip;
+        }
     },
     legend: {
         orient: 'vertical',
@@ -21,7 +24,7 @@ var option = {
         name: '时间',
         type: 'pie',
         radius: [0, 110],
-        center: [400, '50%'],
+        center: [400, '55%'],
         // 数组内容是一个个对象，对象内属性有value和name
         data: [],
         itemStyle: {
@@ -36,7 +39,13 @@ var option = {
 };
 
 function draw() {
-	updateTime();
+    updateTime();
+
+    // 还没有记录过
+    if (localStorage["domains"] == null) {
+        return;
+    }
+
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('container'), 'macarons');
     // 使用刚指定的配置项和数据显示图表。
@@ -50,7 +59,10 @@ function draw() {
             domain: item,
             today: JSON.parse(localStorage[item]).today
         }
-        allDomainsObjArr = allDomainsObjArr.concat(obj);
+
+        if (obj.today != 0) {
+            allDomainsObjArr = allDomainsObjArr.concat(obj);
+        }
     });
 
 
@@ -58,8 +70,11 @@ function draw() {
     allDomainsObjArr = allDomainsObjArr.slice(0, 10);
 
     allDomainsObjArr.forEach(function(item, index, array) {
-        option.legend.data = option.legend.data.concat(item.domain);
-        option.series[0].data = option.series[0].data.concat({ value: item.today, name: item.domain });
+        var legendData = option.legend.data;
+        var seriesData = option.series[0].data;
+
+        option.legend.data = legendData.concat(item.domain);
+        option.series[0].data = seriesData.concat({ value: item.today, name: item.domain });
     });
 
     myChart.setOption(option);
@@ -75,7 +90,7 @@ function compare(obj1, obj2) {
     return 0;
 }
 
-// 点击插件时立即更新插件统计的时间
+// 统计所有窗口的计时并存储起来
 function updateTime() {
     // 这个数组存储已经计算过存储时间的domain，第二次再碰到就不计算了
     var saved = [];
@@ -102,6 +117,31 @@ function updateTime() {
             saved = saved.concat(domain);
         }
     }
+}
+
+// 秒数转时间字符串
+function secondsToTimeStr(seconds) {
+    var hours = 0;
+    var minutes = 0;
+
+    if (seconds >= 3600) {
+        hours = parseInt(seconds / 3600);
+        seconds -= 3600 * hours;
+    }
+
+    if (seconds >= 60) {
+        minutes = parseInt(seconds / 60);
+        seconds -= 60 * minutes;
+    }
+
+    var timeStr = "";
+    if (hours != 0) {
+        timeStr += hours + "时" + minutes + "分";
+    } else if (minutes != 0) {
+        timeStr += minutes + "分";
+    }
+
+    return timeStr + seconds + "秒";
 }
 
 window.addEventListener("load", draw, false);
