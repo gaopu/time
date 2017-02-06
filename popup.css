@@ -1,9 +1,23 @@
-#container {
-	width: 640px;
-	height: 300px;
+body {
+    margin: 0;
+    padding: 0;
 }
 
-#nav {
-	float: right;
-	display: block;
+.nav {
+    float: right;
+}
+
+.nav a {
+    font-weight: lighter;
+    text-decoration: none;
+}
+
+.nav .cur {
+	text-decoration: underline;
+}
+
+#main {
+    width: 640px;
+    height: 300px;
+    clear: both;
 }
