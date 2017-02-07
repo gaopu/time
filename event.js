@@ -21,6 +21,10 @@ function init() {
             windowsArr = windowsArr.concat(windowId);
         }
     });
+
+    // 存储版本号
+    var manifest = chrome.runtime.getManifest();
+    localStorage["version"] = manifest.version;
 }
 
 // 设置定时器，在第二天凌晨零点触发

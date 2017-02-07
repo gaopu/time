@@ -1,0 +1,42 @@
+body {
+    background-color: #666666;
+    margin: 0;
+    padding: 0;
+}
+
+.main {
+    width: 614px;
+    height: 400px;
+    background-color: #272D33;
+    margin: 100px auto;
+    border: 3px solid rgba(178, 186, 193, 0.6);
+    border-radius: 8px;
+}
+
+.head {
+    height: 58px;
+    position: relative;
+    background-color: #3C454C;
+    background-image: url("images/icon48.png");
+    background-repeat: no-repeat;
+    background-position: 5px center;
+}
+
+.head span {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.head span.title{
+    font-size: 40px;
+    line-height: 58px;
+    color: #E4EBF0;
+    margin-left: 58px;
+}
+
+.head span#version {
+	position: absolute;
+	color: #82919D;
+	bottom: 5px;
+	right: 5px;
+	text-shadow: 1px 1px #000;
+}
