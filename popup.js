@@ -24,6 +24,18 @@ function draw(event, flag = "today") {
         return;
     }
 
+    // 根据显示个数调整显示样式
+    var showCounts = localStorage["show"];
+    if (showCounts == 15) {
+        var mainDiv = document.getElementById("main");
+        mainDiv.style.height = "400px";
+        option.legend.height = 400;
+    } else if (showCounts == 20) {
+        var mainDiv = document.getElementById("main");
+        mainDiv.style.height = "500px";
+        option.legend.height = 500;
+    }
+
     // 基于准备好的dom，初始化echarts实例
     myChart = echarts.init(document.getElementById('main'), 'macarons');
     // 使用刚指定的配置项和数据显示图表。
@@ -49,7 +61,7 @@ function draw(event, flag = "today") {
     });
 
     allDomainsObjArr.sort(compare);
-    allDomainsObjArr = allDomainsObjArr.slice(0, 10);
+    allDomainsObjArr = allDomainsObjArr.slice(0, showCounts);
 
     allDomainsObjArr.forEach(function(item, index, array) {
         var legendData = option.legend.data;
@@ -66,7 +78,7 @@ function eventFunction() {
     var id = this.id;
 
     if (this.hasAttribute("class")) {
-    	return;
+        return;
     }
 
     initOption();

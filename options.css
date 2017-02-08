@@ -2,10 +2,11 @@ body {
     background-color: #666666;
     margin: 0;
     padding: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .main {
-    width: 614px;
+    width: 600px;
     height: 400px;
     background-color: #272D33;
     margin: 100px auto;
@@ -22,10 +23,6 @@ body {
     background-position: 5px center;
 }
 
-.head span {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
 .head span.title{
     font-size: 40px;
     line-height: 58px;
@@ -39,4 +36,58 @@ body {
 	bottom: 5px;
 	right: 5px;
 	text-shadow: 1px 1px #000;
+}
+
+.main .options {
+	box-sizing: border-box;
+	height: 342px;
+	padding: 15px 29px;
+    color: #A2AEB5;
+    text-shadow: 1px 1px #000;
+    position: relative;
+}
+
+.options .line {
+	line-height: 24px;
+	margin: 0px 0 10px;
+}
+
+.options span {
+	font-size: 16px;
+}
+
+select {
+	width: 100px;
+	height: 24px;
+}
+
+#saving {
+	width: 180px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    vertical-align: middle;
+	background-color: white;
+    position: absolute;
+    left: calc(50% - 90px);
+    top: calc(50% - 30px);
+    border-radius: 3px;
+    text-shadow: none;
+}
+
+#savingIcon {
+    width: 26px;
+    height: 26px;
+    line-height: 60px;
+    display: inline-block;
+    background-image: url("images/options_saving.gif");
+    background-repeat: no-repeat;
+}
+
+#saving span {
+    vertical-align: middle;
+}
+
+.invisible {
+    display: none;
 }

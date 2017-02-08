@@ -25,6 +25,9 @@ function init() {
     // 存储版本号
     var manifest = chrome.runtime.getManifest();
     localStorage["version"] = manifest.version;
+
+    // 插件默认显示前10个网站的访问时间
+    localStorage["show"] = 10;
 }
 
 // 设置定时器，在第二天凌晨零点触发
