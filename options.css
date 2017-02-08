@@ -32,15 +32,15 @@ body {
 
 .head span#version {
 	position: absolute;
+    bottom: 5px;
+    right: 5px;
 	color: #82919D;
-	bottom: 5px;
-	right: 5px;
 	text-shadow: 1px 1px #000;
 }
 
 .main .options {
 	box-sizing: border-box;
-	height: 342px;
+	height: 314px;
 	padding: 15px 29px;
     color: #A2AEB5;
     text-shadow: 1px 1px #000;
@@ -90,4 +90,18 @@ select {
 
 .invisible {
     display: none;
+}
+
+.footer {
+    height: 28px;
+    background-color: #3C454C;
+    color: #82919D;
+    text-shadow: 1px 1px #000;
+    position: relative;
+}
+
+.footer span {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
 }
