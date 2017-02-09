@@ -2,13 +2,19 @@
     "manifest_version": 2,
 
     "name": "时间",
-    "description": "看看时间都去哪儿了。",
-    "version": "1.17.1",
+    "description": "时间都去哪儿了。",
+    "version": "1.17.2",
 
     "icons": {
         "16": "images/icon16.png",
         "48": "images/icon48.png",
         "128": "images/icon128.png"
+    },
+
+    "options_ui": {
+    	"chrome_style": true,
+        "page": "options.html",
+        "open_in_tab": true
     },
 
     "browser_action": {
@@ -22,13 +28,6 @@
 
     "background": {
         "scripts": ["event.js"]
-    },
-
-    // 设置页面
-    "options_ui": {
-        "chrome_style": true,
-        "page": "options.html",
-        "open_in_tab": true
     },
 
     "permissions": [
