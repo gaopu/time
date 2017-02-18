@@ -74,6 +74,7 @@ function draw(event, flag = "today") {
     myChart.setOption(option);
 }
 
+// 右上角“今日”、“总计”的点击事件处理函数
 function eventFunction() {
     var id = this.id;
 
@@ -121,8 +122,13 @@ function initOption() {
         series: [{
             name: '时间',
             type: 'pie',
-            radius: [0, 110],
-            center: [400, '55%'],
+            radius: [0, 100],
+            label: {
+                normal: {
+                    show: false
+                }
+            },
+            center: [350, '50%'],
             // 数组内容是一个个对象，对象内属性有value和name
             data: [],
             itemStyle: {
@@ -201,4 +207,27 @@ function secondsToTimeStr(seconds) {
     return timeStr + seconds + "秒";
 }
 
-window.addEventListener("load", draw, false);
+// 页面加载后第一个执行
+function start() {
+    var uuid = localStorage["uuid"];
+    // 表示未登录
+    var logined = false;
+
+    // 有uuid值，验证是否是真的登陆了
+    if (uuid != null) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                console.log(xhr.responseText);
+            }
+        }
+
+        xhr.open("post","http://127.0.0.1:8080/verify",true);
+        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        var data = encodeURIComponent("uuid") + "=" + encodeURIComponent(uuid);
+        xhr.send(data);
+    }
+    draw();
+}
+
+window.addEventListener("load", start, false);
