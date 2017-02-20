@@ -11,11 +11,43 @@
 </head>
 
 <body>
-    <div class="nav">
-        <a href="#" id="today" class="cur">今日</a>
-        <a href="#" id="all">总计</a>
+    <div id="logined">
+        <div class="nav">
+            <a href="#" id="today" class="cur">今日</a>
+            <a href="#" id="all">总计</a>
+        </div>
+        <div id="main"></div>
     </div>
-    <div id="main"></div>
+
+    <div id="nologined">
+        <div class="logo"></div>
+        <div class="navs">
+            <div class="nav-slider">
+                <a href="#signin" class="cur">登录</a>
+                <a href="#signup">注册</a>
+                <span class="underline"></span>
+            </div>
+        </div>
+
+        <div id="signup">
+            <form action="http://127.0.0.1:8080/regist" method="post">
+                <input type="text" name="phone">
+                <input type="text" name="nickname">
+                <input type="text" name="password">
+                <input type="text" name="password2">
+                <div class="button-wrapper">
+                    <button type="submit" class="signup-button">注册</button>
+                </div>
+            </form>
+        </div>
+        <div id="signin">
+            <input type="text" name="phone">
+            <input type="text" name="password">
+            <div class="button-wrapper">
+                <button type="submit" class="signin-button">登录</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

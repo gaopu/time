@@ -1,18 +1,19 @@
 body {
     margin: 0;
     padding: 0;
+    font-family: 'Helvetica Neue',Helvetica,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,sans-serif;
 }
 
-.nav {
+#logined .nav {
     float: right;
 }
 
-.nav a {
+#logined .nav a {
     font-weight: lighter;
     text-decoration: none;
 }
 
-.nav .cur {
+#logined .nav .cur {
 	text-decoration: underline;
 }
 
@@ -20,4 +21,88 @@ body {
     width: 500px;
     height: 300px;
     clear: both;
+}
+
+/*================================================================*/
+/*登录注册页面*/
+
+#nologined {
+    box-sizing: border-box;
+    width: 360px;
+    padding: 24px 24px;
+}
+
+#nologined .logo {
+    height: 64px;
+    width: 64px;
+    background: url("images/icon64.png");
+    background-repeat: no-repeat;
+    margin: 0 auto 10px;
+}
+
+#nologined .navs {
+    text-align: center;
+    font-size: 18px;
+    margin: 0 0 11px;
+}
+
+#nologined .nav-slider {
+    position: relative;
+    display: inline-block;
+    height: 2em;
+    margin: auto;
+}
+
+#nologined .nav-slider a {
+    display: inline-block;
+    color: #666;
+    width: 4em;
+    line-height: 2em;
+    text-decoration: none;
+}
+
+#nologined .nav-slider a.cur {
+    color: #13b2ad;
+}
+
+#nologined .nav-slider .underline {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin: 0 0.8em;
+    width: 2.4em;
+    height: 2px;
+    text-align: center;
+    background-color: #13b2ad;
+    display: block;
+}
+
+#signup {
+    /*display: none;*/
+}
+
+#signup, #signin {
+    text-align: center;
+}
+
+#signup input, #signin input {
+    box-sizing: border-box;
+    margin: -1px 0 0;
+    width: 100%;
+    height: 40px;
+    outline: none;
+}
+
+#signup .button-wrapper, #signin .button-wrapper {
+    margin: 14px 0 0;
+}
+
+#signup .button-wrapper .signup-button, #signin .button-wrapper .signin-button {
+    width: 100%;
+    border: 0;
+    border-radius: 3px;
+    font-size: 15px;
+    background-color: #13b2ad;
+    color: white;
+    line-height: 41px;
 }

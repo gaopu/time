@@ -122,7 +122,7 @@ function initOption() {
         series: [{
             name: '时间',
             type: 'pie',
-            radius: [0, 100],
+            radius: [0, 110],
             label: {
                 normal: {
                     show: false
@@ -218,16 +218,26 @@ function start() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                console.log(xhr.responseText);
+                var result = JSON.parse(xhr.responseText);
+                if (result.code == 0) {
+                    logined = true;
+                }
             }
         }
 
-        xhr.open("post","http://127.0.0.1:8080/verify",true);
+        xhr.open("post","http://127.0.0.1:8080/verify",false);
         xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
         var data = encodeURIComponent("uuid") + "=" + encodeURIComponent(uuid);
         xhr.send(data);
     }
-    draw();
+
+    // 根据登录与否判断显示哪一个div
+    if (logined) {
+        document.getElementById("nologined").style.display = "none";
+        draw();
+    } else {
+        document.getElementById("logined").style.display = "none";
+    }
 }
 
 window.addEventListener("load", start, false);
