@@ -55,17 +55,22 @@ body {
 
 #nologined .nav-slider a {
     display: inline-block;
-    color: #666;
+    float: left;
+    color: #999;
     width: 4em;
     line-height: 2em;
     text-decoration: none;
+}
+
+#nologined .nav-slider a:hover {
+    color: #666;
 }
 
 #nologined .nav-slider a.cur {
     color: #13b2ad;
 }
 
-#nologined .nav-slider .underline {
+#nologined .nav-slider #underline {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -78,7 +83,7 @@ body {
 }
 
 #signup {
-    /*display: none;*/
+    display: none;
 }
 
 #signup, #signin {
@@ -86,11 +91,13 @@ body {
 }
 
 #signup input, #signin input {
+    color: #666;
     box-sizing: border-box;
     margin: -1px 0 0;
     width: 100%;
     height: 40px;
     outline: none;
+    padding: 1em .8em;
 }
 
 #signup .button-wrapper, #signin .button-wrapper {
@@ -105,4 +112,10 @@ body {
     background-color: #13b2ad;
     color: white;
     line-height: 41px;
+    outline: none;
+    cursor: pointer;
+}
+
+#signup .button-wrapper .signup-button:hover, #signin .button-wrapper .signin-button:hover {
+    background-color: #33d2cd;
 }

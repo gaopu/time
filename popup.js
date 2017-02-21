@@ -238,6 +238,71 @@ function start() {
     } else {
         document.getElementById("logined").style.display = "none";
     }
+
+    initEvent();
+}
+
+// 创建一些事件处理
+function initEvent() {
+    // 登录注册页面的submit按钮的事件处理
+    document.getElementById("signin-form").addEventListener("submit", submitEventHandler , false);
+    document.getElementById("signup-form").addEventListener("submit", submitEventHandler , false);
+
+    //注册、登录页面切换事件
+    document.getElementById("signin-index").addEventListener("click", function() {
+        document.getElementById("signup-index").removeAttribute("class");
+        document.getElementById("signin-index").setAttribute("class", "cur");
+        document.getElementById("underline").style.left = 0;
+        document.getElementById("signin").style.display = "block";
+        document.getElementById("signup").style.display = "none";
+    }, false);
+
+    document.getElementById("signup-index").addEventListener("click", function() {
+        document.getElementById("signin-index").removeAttribute("class");
+        document.getElementById("signup-index").setAttribute("class", "cur");
+        document.getElementById("underline").style.left = "4em";
+        document.getElementById("signup").style.display = "block";
+        document.getElementById("signin").style.display = "none";
+    }, false);
+}
+
+function submitEventHandler(event) {
+    var form = event.target;
+    event.preventDefault();
+
+    var url;
+    var data;
+    if (form.id == "signin-form") {
+        url = "http://127.0.0.1:8080/login";
+        data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
+        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(form.elements["password"].value);
+    } else {
+        url = "http://127.0.0.1:8080/regist";
+        data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
+        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(form.elements["password"].value);
+        data += "&" + encodeURIComponent("password2") + "=" + encodeURIComponent(form.elements["password2"].value);
+        data += "&" + encodeURIComponent("nickname") + "=" + encodeURIComponent(form.elements["nickname"].value);
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            var result = JSON.parse(xhr.responseText);
+            if (result.code == 0) {
+                if (form.id == "signin-form") {
+                    localStorage["uuid"] = result.uuid;
+                    localStorage["logined"] = "on";
+                    location.reload();
+                } else {
+
+                }
+            }
+        }
+    }
+
+    xhr.open("post",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(data);
 }
 
 window.addEventListener("load", start, false);
