@@ -275,12 +275,12 @@ function submitEventHandler(event) {
     if (form.id == "signin-form") {
         url = "http://127.0.0.1:8080/login";
         data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
-        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(form.elements["password"].value);
+        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(hex_md5(form.elements["password"].value).substr(5,24));
     } else {
         url = "http://127.0.0.1:8080/regist";
         data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
-        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(form.elements["password"].value);
-        data += "&" + encodeURIComponent("password2") + "=" + encodeURIComponent(form.elements["password2"].value);
+        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(hex_md5(form.elements["password"].value).substr(5,24));
+        data += "&" + encodeURIComponent("password2") + "=" + encodeURIComponent(hex_md5(form.elements["password2"].value).substr(5,24));
         data += "&" + encodeURIComponent("nickname") + "=" + encodeURIComponent(form.elements["nickname"].value);
     }
 
