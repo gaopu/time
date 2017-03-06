@@ -33,6 +33,7 @@
     "permissions": [
         "tabs",
         "alarms",
+        "unlimitedStorage",
         "http://127.0.0.1/"
     ]
 }
