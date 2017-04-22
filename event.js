@@ -27,10 +27,23 @@ function init() {
     chrome.windows.getAll(function(windows) {
         for (var i = 0; i < windows.length; i++) {
             var windowId = windows[i].id;
-
-            windowsArr = windowsArr.concat(windowId);
+            windowsArr.push(windowId);
         }
     });
+
+    //有时候窗口计时信息会删除不干净，所以用此方法来删除
+    //windows用来保存此次使用本插件打开的所有窗口，在每次开始使用插件时检测是否有上次窗口的计时信息没有被删除
+    if (localStorage["windows"] == null) {
+        localStorage["windows"] = "";
+    } else {
+        var arr = localStorage["windows"].split(",");
+        for (var i = 0;i < arr.length;i++) {
+            if (localStorage[arr[i]] != null) {
+                localStorage.removeItem(arr[i]);
+            }
+        }
+        localStorage["windows"] = "";
+    }
 }
 
 // 设置定时器，在第二天凌晨零点触发
@@ -164,7 +177,8 @@ function startTimer(windowId, tabId, url) {
         }
 
         if (!have) {
-            windowsArr = windowsArr.concat(windowId);
+            windowsArr.push(windowId);
+            localStorage["windows"] = localStorage["windows"] + windowId + ",";
         }
     });
 }

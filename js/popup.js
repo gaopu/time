@@ -9,11 +9,11 @@ var myChart = null;
 // 我发现页面刚一打开时，第一个参数打印出来会是一个Event对象，应该是页面load的事件，所以这里将flag放入第二个参数
 function draw(event, flag = "today") {
     if (myChart == null) {
-        var todayBtn = document.getElementById("today");
-        var allBtn = document.getElementById("all");
+        var todayBtn = $("#today");
+        var allBtn = $("#all");
 
-        todayBtn.addEventListener("click", eventFunction, false);
-        allBtn.addEventListener("click", eventFunction, false);
+        todayBtn.on("click", eventFunction);
+        allBtn.on("click", eventFunction);
     }
 
     initOption();
@@ -27,17 +27,17 @@ function draw(event, flag = "today") {
     // 根据显示个数调整显示样式
     var showCounts = localStorage["show"];
     if (showCounts == 15) {
-        var mainDiv = document.getElementById("main");
-        mainDiv.style.height = "400px";
+        var mainDiv = $("#main");
+        mainDiv.css("height","400px");
         option.legend.height = 400;
     } else if (showCounts == 20) {
-        var mainDiv = document.getElementById("main");
-        mainDiv.style.height = "500px";
+        var mainDiv = $("#main");
+        mainDiv.css("height","500px");
         option.legend.height = 500;
     }
 
     // 基于准备好的dom，初始化echarts实例
-    myChart = echarts.init(document.getElementById('main'), 'macarons');
+    myChart = echarts.init($('#main')[0], 'macarons');
     // 使用刚指定的配置项和数据显示图表。
 
     var allDomainsStrArr = localStorage["domains"].split(",");
@@ -56,7 +56,7 @@ function draw(event, flag = "today") {
         }
 
         if (obj.value != 0) {
-            allDomainsObjArr = allDomainsObjArr.concat(obj);
+            allDomainsObjArr.push(obj);
         }
     });
 
@@ -64,11 +64,8 @@ function draw(event, flag = "today") {
     allDomainsObjArr = allDomainsObjArr.slice(0, showCounts);
 
     allDomainsObjArr.forEach(function(item, index, array) {
-        var legendData = option.legend.data;
-        var seriesData = option.series[0].data;
-
-        option.legend.data = legendData.concat(item.domain);
-        option.series[0].data = seriesData.concat({ value: item.value, name: item.domain });
+        option.legend.data.push(item.domain);
+        option.series[0].data.push({ value: item.value, name: item.domain });
     });
 
     myChart.setOption(option);
@@ -78,7 +75,7 @@ function draw(event, flag = "today") {
 function eventFunction() {
     var id = this.id;
 
-    if (this.hasAttribute("class")) {
+    if ($(this).attr("class") != null) {
         return;
     }
 
@@ -87,15 +84,13 @@ function eventFunction() {
 
     if (id == "today") {
         draw(null, "today");
-        document.getElementById("all").removeAttribute("class");
-        this.setAttribute("class", "cur");
+        $("#all").removeAttr("class");
+        $(this).attr("class", "cur");
     } else {
         draw(null, "all");
-        document.getElementById("today").removeAttribute("class");
-        this.setAttribute("class", "cur");
+        $("#today").removeAttr("class");
+        $(this).attr("class", "cur");
     }
-
-
 }
 
 // 初始化option参数
@@ -177,7 +172,7 @@ function updateTime() {
 
         if (notSave) {
             bg.saveTime(windowId);
-            saved = saved.concat(domain);
+            saved.push(domain);
         }
     }
 }
@@ -207,65 +202,31 @@ function secondsToTimeStr(seconds) {
     return timeStr + seconds + "秒";
 }
 
-// 页面加载后第一个执行
-function start() {
-    var uuid = localStorage["uuid"];
-    // 表示未登录
-    var logined = false;
-
-    // 有uuid值，验证是否是真的登陆了
-    if (uuid != null) {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                var result = JSON.parse(xhr.responseText);
-                if (result.code == 0) {
-                    logined = true;
-                }
-            }
-        }
-
-        xhr.open("post","http://127.0.0.1:8080/verify",false);
-        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-        var data = encodeURIComponent("uuid") + "=" + encodeURIComponent(uuid);
-        xhr.send(data);
-    }
-
-    // 根据登录与否判断显示哪一个div
-    if (logined) {
-        document.getElementById("nologined").style.display = "none";
-        draw();
-    } else {
-        document.getElementById("logined").style.display = "none";
-    }
-
-    initEvent();
-}
-
 // 创建一些事件处理
+//1.注册、登录页面切换事件
 function initEvent() {
     // 登录注册页面的submit按钮的事件处理
-    document.getElementById("signin-form").addEventListener("submit", submitEventHandler , false);
-    document.getElementById("signup-form").addEventListener("submit", submitEventHandler , false);
+    $("#signin-form").on("submit", submitEventHandler);
+    $("#signup-form").on("submit", submitEventHandler);
 
     //注册、登录页面切换事件
-    document.getElementById("signin-index").addEventListener("click", function() {
-        document.getElementById("signup-index").removeAttribute("class");
-        document.getElementById("signin-index").setAttribute("class", "cur");
-        document.getElementById("underline").style.left = 0;
-        document.getElementById("signin").style.display = "block";
-        document.getElementById("signup").style.display = "none";
-    }, false);
-
-    document.getElementById("signup-index").addEventListener("click", function() {
-        document.getElementById("signin-index").removeAttribute("class");
-        document.getElementById("signup-index").setAttribute("class", "cur");
-        document.getElementById("underline").style.left = "4em";
-        document.getElementById("signup").style.display = "block";
-        document.getElementById("signin").style.display = "none";
-    }, false);
+    $("#signin-index").on("click", function() {
+        $("#signup-index").removeAttr("class");
+        $("#signin-index").attr("class", "cur");
+        $("#underline").css("left",0);
+        $("#signin").css("display","block");
+        $("#signup").css("display","none");
+    });
+    $("#signup-index").on("click", function() {
+        $("#signin-index").removeAttr("class");
+        $("#signup-index").attr("class", "cur");
+        $("#underline").css("left","4em");
+        $("#signup").css("display","block");
+        $("#signin").css("display","none");
+    });
 }
 
+// 提交按钮点击后的事件处理器
 function submitEventHandler(event) {
     var form = event.target;
     event.preventDefault();
@@ -274,35 +235,61 @@ function submitEventHandler(event) {
     var data;
     if (form.id == "signin-form") {
         url = "http://127.0.0.1:8080/login";
-        data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
-        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(hex_md5(form.elements["password"].value).substr(5,24));
+        data = {
+            phone: form.elements["phone"].value,
+            password: hex_md5(form.elements["password"].value).substr(5,24)
+        };
     } else {
         url = "http://127.0.0.1:8080/regist";
-        data = encodeURIComponent("phone") + "=" + encodeURIComponent(form.elements["phone"].value);
-        data += "&" + encodeURIComponent("password") + "=" + encodeURIComponent(hex_md5(form.elements["password"].value).substr(5,24));
-        data += "&" + encodeURIComponent("password2") + "=" + encodeURIComponent(hex_md5(form.elements["password2"].value).substr(5,24));
-        data += "&" + encodeURIComponent("nickname") + "=" + encodeURIComponent(form.elements["nickname"].value);
+        data = {
+            phone: form.elements["phone"].value,
+            password: hex_md5(form.elements["password"].value).substr(5,24),
+            password2: hex_md5(form.elements["password2"].value).substr(5,24),
+            nickname: form.elements["nickname"].value
+        };
     }
 
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-            var result = JSON.parse(xhr.responseText);
-            if (result.code == 0) {
-                if (form.id == "signin-form") {
-                    localStorage["uuid"] = result.uuid;
-                    localStorage["logined"] = "on";
-                    location.reload();
-                } else {
+    $.post(url, data, function(result) {
+        result = JSON.parse(result);
+        if (result.code == 0) {
+            if (form.id == "signin-form") {
+                localStorage["uuid"] = result.uuid;
+                localStorage["logined"] = "on";
+                location.reload();
+            } else {
 
-                }
             }
         }
-    }
+    });
+}
 
-    xhr.open("post",url,true);
-    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xhr.send(data);
+// 页面加载后第一个执行
+function start() {
+    var uuid = localStorage["uuid"];
+    // 表示未登录
+    var logined = false;
+
+    // 有uuid值，验证是否是真的登陆了
+    if (uuid != null) {
+        var data = {
+            uuid: uuid
+        };
+        $.post("http://127.0.0.1:8080/verify", data, function(result) {
+            result = JSON.parse(result);
+            if (result.code == 0) {
+                logined = true;
+            }
+
+            // 根据登录与否判断显示哪一个div
+            if (logined) {
+                $("#nologined").hide();
+                draw();
+            } else {
+                $("#logined").hide();
+            }
+        });
+    }
+    initEvent();
 }
 
 window.addEventListener("load", start, false);

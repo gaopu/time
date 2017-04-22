@@ -18,7 +18,7 @@ body {
     height: 58px;
     position: relative;
     background-color: #3C454C;
-    background-image: url("images/icon48.png");
+    background-image: url("../images/icon48.png");
     background-repeat: no-repeat;
     background-position: 5px center;
 }
@@ -80,7 +80,7 @@ select {
     height: 26px;
     line-height: 60px;
     display: inline-block;
-    background-image: url("images/options_saving.gif");
+    background-image: url("../images/options_saving.gif");
     background-repeat: no-repeat;
 }
 

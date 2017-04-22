@@ -11,6 +11,12 @@ body {
 #logined .nav a {
     font-weight: lighter;
     text-decoration: none;
+    color: #13b2ad;
+}
+
+#logined .nav .split-line {
+    padding: 0 5px;
+    color: #999;
 }
 
 #logined .nav .cur {
@@ -35,7 +41,7 @@ body {
 #nologined .logo {
     height: 64px;
     width: 64px;
-    background: url("images/icon64.png");
+    background: url("../images/icon64.png");
     background-repeat: no-repeat;
     margin: 0 auto 10px;
 }
