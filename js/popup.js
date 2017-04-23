@@ -1,4 +1,5 @@
 var bg = chrome.extension.getBackgroundPage();
+var host = "http://127.0.0.1:8080/TimeServer";
 
 // 指定图表的配置项和数据
 var option = null;
@@ -234,13 +235,13 @@ function submitEventHandler(event) {
     var url;
     var data;
     if (form.id == "signin-form") {
-        url = "http://127.0.0.1:8080/login";
+        url = host + "/login";
         data = {
             phone: form.elements["phone"].value,
             password: hex_md5(form.elements["password"].value).substr(5,24)
         };
     } else {
-        url = "http://127.0.0.1:8080/regist";
+        url = host + "/regist";
         data = {
             phone: form.elements["phone"].value,
             password: hex_md5(form.elements["password"].value).substr(5,24),
@@ -274,7 +275,7 @@ function start() {
         var data = {
             uuid: uuid
         };
-        $.post("http://127.0.0.1:8080/verify", data, function(result) {
+        $.post( host + "/verify", data, function(result) {
             result = JSON.parse(result);
             if (result.code == 0) {
                 logined = true;
@@ -282,10 +283,9 @@ function start() {
 
             // 根据登录与否判断显示哪一个div
             if (logined) {
+                $("#logined").show();
                 $("#nologined").hide();
                 draw();
-            } else {
-                $("#logined").hide();
             }
         });
     }
