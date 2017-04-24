@@ -9,13 +9,13 @@ function init() {
     if (localStorage["today"] == null) {
         setTodayDate();
 
-        // 存储版本号
-        var manifest = chrome.runtime.getManifest();
-        localStorage["version"] = manifest.version;
-
         // 插件默认显示前10个网站的访问时间
         localStorage["show"] = 10;
     }
+
+    // 存储版本号
+    var manifest = chrome.runtime.getManifest();
+    localStorage["version"] = manifest.version;
 
     // 如果"today"属性不是今天的日期时：设置每个网站的"today"属性为"0"
     if (localStorage["today"] != new Date().toLocaleDateString()) {
