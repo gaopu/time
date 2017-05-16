@@ -266,30 +266,30 @@ function submitEventHandler(event) {
 
 // 页面加载后第一个执行
 function start() {
-    var uuid = localStorage["uuid"];
-    // 表示未登录
-    var logined = false;
+    // var uuid = localStorage["uuid"];
+    // // 表示未登录
+    // var logined = false;
 
-    // 有uuid值，验证是否是真的登陆了
-    if (uuid != null) {
-        var data = {
-            uuid: uuid
-        };
-        $.post( host + "/verify", data, function(result) {
-            result = JSON.parse(result);
-            if (result.code == 0) {
-                logined = true;
-            }
+    // // 有uuid值，验证是否是真的登陆了
+    // if (uuid != null) {
+    //     var data = {
+    //         uuid: uuid
+    //     };
+    //     $.post( host + "/verify", data, function(result) {
+    //         result = JSON.parse(result);
+    //         if (result.code == 0) {
+    //             logined = true;
+    //         }
 
-            // 根据登录与否判断显示哪一个div
-            if (logined) {
-                $("#logined").show();
-                $("#nologined").hide();
+    //         // 根据登录与否判断显示哪一个div
+    //         if (logined) {
+    //             $("#logined").show();
+    //             $("#nologined").hide();
                 draw();
-            }
-        });
-    }
-    initEvent();
+    //         }
+    //     });
+    // }
+    // initEvent();
 }
 
 window.addEventListener("load", start, false);
