@@ -179,8 +179,14 @@ function updateTime() {
 
 // 秒数转时间字符串
 function secondsToTimeStr(seconds) {
+    var days = 0;
     var hours = 0;
     var minutes = 0;
+
+    if (seconds >= 86400) {
+        days = parseInt(seconds / 86400);
+        seconds -= 86400 * days;
+    }
 
     if (seconds >= 3600) {
         hours = parseInt(seconds / 3600);
@@ -193,13 +199,15 @@ function secondsToTimeStr(seconds) {
     }
 
     var timeStr = "";
-    if (hours != 0) {
-        timeStr += hours + "时" + minutes + "分";
+    if (days != 0) {
+        return days + "天<br>" + hours + "时" + minutes + "分" + seconds + "秒";
+    } else if (hours != 0) {
+        return hours + "时" + minutes + "分" + seconds + "秒";
     } else if (minutes != 0) {
-        timeStr += minutes + "分";
+        return minutes + "分" + seconds + "秒";
+    } else {
+        return seconds + "秒"
     }
-
-    return timeStr + seconds + "秒";
 }
 
 // 页面加载后第一个执行 
