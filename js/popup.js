@@ -1,5 +1,4 @@
 var bg = chrome.extension.getBackgroundPage();
-var host = "http://127.0.0.1:8080/TimeServer";
 
 // 指定图表的配置项和数据
 var option = null;
@@ -203,93 +202,9 @@ function secondsToTimeStr(seconds) {
     return timeStr + seconds + "秒";
 }
 
-// 创建一些事件处理
-//1.注册、登录页面切换事件
-function initEvent() {
-    // 登录注册页面的submit按钮的事件处理
-    $("#signin-form").on("submit", submitEventHandler);
-    $("#signup-form").on("submit", submitEventHandler);
-
-    //注册、登录页面切换事件
-    $("#signin-index").on("click", function() {
-        $("#signup-index").removeAttr("class");
-        $("#signin-index").attr("class", "cur");
-        $("#underline").css("left",0);
-        $("#signin").css("display","block");
-        $("#signup").css("display","none");
-    });
-    $("#signup-index").on("click", function() {
-        $("#signin-index").removeAttr("class");
-        $("#signup-index").attr("class", "cur");
-        $("#underline").css("left","4em");
-        $("#signup").css("display","block");
-        $("#signin").css("display","none");
-    });
-}
-
-// 提交按钮点击后的事件处理器
-function submitEventHandler(event) {
-    var form = event.target;
-    event.preventDefault();
-
-    var url;
-    var data;
-    if (form.id == "signin-form") {
-        url = host + "/login";
-        data = {
-            phone: form.elements["phone"].value,
-            password: hex_md5(form.elements["password"].value).substr(5,24)
-        };
-    } else {
-        url = host + "/regist";
-        data = {
-            phone: form.elements["phone"].value,
-            password: hex_md5(form.elements["password"].value).substr(5,24),
-            password2: hex_md5(form.elements["password2"].value).substr(5,24),
-            nickname: form.elements["nickname"].value
-        };
-    }
-
-    $.post(url, data, function(result) {
-        result = JSON.parse(result);
-        if (result.code == 0) {
-            if (form.id == "signin-form") {
-                localStorage["uuid"] = result.uuid;
-                localStorage["logined"] = "on";
-                location.reload();
-            } else {
-
-            }
-        }
-    });
-}
-
-// 页面加载后第一个执行
+// 页面加载后第一个执行 
 function start() {
-    // var uuid = localStorage["uuid"];
-    // // 表示未登录
-    // var logined = false;
-
-    // // 有uuid值，验证是否是真的登陆了
-    // if (uuid != null) {
-    //     var data = {
-    //         uuid: uuid
-    //     };
-    //     $.post( host + "/verify", data, function(result) {
-    //         result = JSON.parse(result);
-    //         if (result.code == 0) {
-    //             logined = true;
-    //         }
-
-    //         // 根据登录与否判断显示哪一个div
-    //         if (logined) {
-    //             $("#logined").show();
-    //             $("#nologined").hide();
-                draw();
-    //         }
-    //     });
-    // }
-    // initEvent();
-}
-
-window.addEventListener("load", start, false);
+    draw(); 
+} 
+ 
+window.addEventListener("load", start, false); 
