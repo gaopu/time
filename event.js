@@ -23,27 +23,25 @@ function init() {
         setTodayDate();
     }
 
-    //有时候窗口计时信息会删除不干净，所以用此方法来删除
-    //windows用来保存此次使用本插件打开的所有窗口，在每次开始使用插件时检测是否有上次窗口的计时信息没有被删除
-    if (localStorage["windows"] == null) {
-        localStorage["windows"] = "";
-    } else {
-        var arr = localStorage["windows"].split(",");
-        for (var i = 0;i < arr.length;i++) {
-            if (localStorage[arr[i]] != null) {
-                localStorage["deleted"] = arr[i] + "被删除";
-                localStorage.removeItem(arr[i]);
-            }
+    //有时候窗口计时信息会删除不干净，所以用此方法来删除：遍历所有存储的数据，删除key是纯数字的数据
+    var numRegex = /^\d+$/;
+    var willDeleteKeyArr = [];
+    for (var i = 0;i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (numRegex.test(key)) {
+            willDeleteKeyArr.push(key);
         }
-        localStorage["windows"] = "";
     }
+
+    willDeleteKeyArr.forEach(function(key) {
+        localStorage.removeItem(key);
+    });
 
     // 填充windowsArr数组
     chrome.windows.getAll(function(windows) {
         for (var i = 0; i < windows.length; i++) {
             var windowId = windows[i].id;
             windowsArr.push(windowId);
-            localStorage["windows"] = localStorage["windows"] + windowId + ",";
         }
     });
 }
@@ -99,7 +97,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         // 记录新的计时状态
         startTimer(windowId, tabId, url);
     });
-    cacheYesterdayTime();
 });
 
 // window关闭时，结束并保存那个window的网站计时
@@ -180,7 +177,6 @@ function startTimer(windowId, tabId, url) {
 
         if (!have) {
             windowsArr.push(windowId);
-            localStorage["windows"] = localStorage["windows"] + windowId + ",";
         }
     });
 }
@@ -264,44 +260,7 @@ function getSaveJsonStr(domain, start) {
     return '{"today":' + today + ',"all":' + all + '}';
 }
 
-// 将数据库中的"未同步区"数据同步到云端
-function pushData() {
-
-}
-
-// 将前一日数据缓冲存储到"未同步区"
-function cacheYesterdayTime() {
-    var yesterdayDate = localStorage["today"];
-    // 需要存储到数据库中的对象
-    var data = {
-        "date": yesterdayDate
-    }
-
-    var domainsStr = localStorage["domains"];
-    if (domainsStr != null) {
-        var domainsArr = domainsStr.split(",");
-        for (var i = 0; i < domainsArr.length; i++) {
-            var domainStr = domainsArr[i];
-            var domainTimeJsonObj = JSON.parse(localStorage[domainStr]);
-            if (domainTimeJsonObj.today != 0) {
-                data[domainStr] = domainTimeJsonObj.today;
-            }
-        }
-    }
-
-    var request = indexedDB.open("time");
-    request.onupgradeneeded = function(event) {
-        var db = event.target.result;
-        var store = db.createObjectStore("nopush",{keypath: "date"});
-        var transaction = event.target.transaction;
-
-        transaction.oncomplete = function(event) {
-            store.add(data);
-        }
-    }
-}
-
-// 每日第一次访问插件时，更新所有网站的访问时间，即将每个网站的今日访问时间"today"更新为0,。
+// 将每个网站的今日访问时间"today"更新为0,。
 function setTodayZero() {
     var domainsStr = localStorage["domains"];
     if (domainsStr != null) {

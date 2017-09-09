@@ -4,26 +4,22 @@ body {
     font-family: 'Helvetica Neue',Helvetica,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,sans-serif;
 }
 
-#logined {
-    // display: none;
-}
-
-#logined .nav {
+.nav {
     float: right;
 }
 
-#logined .nav a {
+.nav a {
     font-weight: lighter;
     text-decoration: none;
     color: #13b2ad;
 }
 
-#logined .nav .split-line {
+.nav .split-line {
     padding: 0 5px;
     color: #999;
 }
 
-#logined .nav .cur {
+.nav .cur {
 	text-decoration: underline;
 }
 
@@ -31,101 +27,4 @@ body {
     width: 500px;
     height: 300px;
     clear: both;
-}
-
-/*================================================================*/
-/*登录注册页面*/
-
-#nologined {
-    box-sizing: border-box;
-    width: 360px;
-    padding: 24px 24px;
-}
-
-#nologined .logo {
-    height: 64px;
-    width: 64px;
-    background: url("../images/icon64.png");
-    background-repeat: no-repeat;
-    margin: 0 auto 10px;
-}
-
-#nologined .navs {
-    text-align: center;
-    font-size: 18px;
-    margin: 0 0 11px;
-}
-
-#nologined .nav-slider {
-    position: relative;
-    display: inline-block;
-    height: 2em;
-    margin: auto;
-}
-
-#nologined .nav-slider a {
-    display: inline-block;
-    float: left;
-    color: #999;
-    width: 4em;
-    line-height: 2em;
-    text-decoration: none;
-}
-
-#nologined .nav-slider a:hover {
-    color: #666;
-}
-
-#nologined .nav-slider a.cur {
-    color: #13b2ad;
-}
-
-#nologined .nav-slider #underline {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    margin: 0 0.8em;
-    width: 2.4em;
-    height: 2px;
-    text-align: center;
-    background-color: #13b2ad;
-    display: block;
-}
-
-#signup {
-    display: none;
-}
-
-#signup, #signin {
-    text-align: center;
-}
-
-#signup input, #signin input {
-    color: #666;
-    box-sizing: border-box;
-    margin: -1px 0 0;
-    width: 100%;
-    height: 40px;
-    outline: none;
-    padding: 1em .8em;
-}
-
-#signup .button-wrapper, #signin .button-wrapper {
-    margin: 14px 0 0;
-}
-
-#signup .button-wrapper .signup-button, #signin .button-wrapper .signin-button {
-    width: 100%;
-    border: 0;
-    border-radius: 3px;
-    font-size: 15px;
-    background-color: #13b2ad;
-    color: white;
-    line-height: 41px;
-    outline: none;
-    cursor: pointer;
-}
-
-#signup .button-wrapper .signup-button:hover, #signin .button-wrapper .signin-button:hover {
-    background-color: #33d2cd;
 }
