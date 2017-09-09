@@ -206,7 +206,7 @@ function secondsToTimeStr(seconds) {
     } else if (minutes != 0) {
         return minutes + "分" + seconds + "秒";
     } else {
-        return seconds + "秒"
+        return seconds + "秒";
     }
 }
 
