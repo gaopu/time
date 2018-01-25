@@ -42,13 +42,17 @@ function draw(event, flag = "today") {
 
     var allDomainsStrArr = localStorage["domains"].split(",");
     var allDomainsObjArr = [];
+    var newDomains = "";
 
     // 将所有domain的数据放入对象，这些对象放入allDomainsObjArr中
     allDomainsStrArr.forEach(function(item, index, array) {
         var obj = {
             domain: item
         }
-
+        if (localStorage[item] == null) {
+            return;
+        }
+        newDomains += item + ","
         if (flag == "today") {
             obj.value = JSON.parse(localStorage[item]).today;
         } else {
@@ -210,9 +214,9 @@ function secondsToTimeStr(seconds) {
     }
 }
 
-// 页面加载后第一个执行 
+// 页面加载后第一个执行
 function start() {
-    draw(); 
-} 
- 
-window.addEventListener("load", start, false); 
+    draw();
+}
+
+window.addEventListener("load", start, false);
