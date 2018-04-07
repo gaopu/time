@@ -215,7 +215,6 @@ function saveTime(windowId) {
 
                 if (info != null) {
                     localStorage[jsonObj.domain] = JSON.stringify({
-                        site: info.site,
                         today: info.today,
                         all: info.all
                     });
@@ -299,13 +298,9 @@ function setTodayZero() {
         var domainsArr = domainsStr.split(",");
         for (var i = 0; i < domainsArr.length; i++) {
             var domain = domainsArr[i];
-            var domainTimeJsonObj = JSON.parse(localStorage[domain]);
-            var allTime = domainTimeJsonObj.all;
-
-            localStorage[domain] = JSON.stringify({
-                today: 0,
-                all: allTime
-            });
+            var domainObj = JSON.parse(localStorage[domain]);
+            domainObj.today = 0;
+            localStorage[domain] = JSON.stringify(domainObj);
         }
     }
 }
@@ -338,7 +333,12 @@ function getDateString(millis) {
     }
 }
 
-//存储{"site":"developer.chrome.com","all":274}
+/*
+{
+    site: "douyu.com", 
+    all: 704
+}
+*/
 function allStore(obj) {
     var db = open.result;
     var tx = db.transaction("allStore", "readwrite");
@@ -346,6 +346,13 @@ function allStore(obj) {
     allStore.put(obj);
 }
 
+/*
+{
+    site: "reactjs.org",
+    date: "2018/4/7",
+    duration: 164
+}
+*/
 function historyStore(obj) {
     var db = open.result;
     var tx = db.transaction("historyStore", "readwrite");
