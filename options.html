@@ -1,34 +1,64 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>选项</title>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/options.css">
     <script type="text/javascript" src="js/jquery-3.1.1.js"></script>
-    <script type="text/javascript" src="js/options.js"></script>
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/myVueComponent/time-dashboard.js"></script>
+    <script type="text/javascript" src="js/myVueComponent/time-history.js"></script>
+    <script type="text/javascript" src="js/myVueComponent/time-options.js"></script>
 </head>
 
 <body>
-    <div class="main">
-        <div class="head">
-            <span class="title">时间</span>
-            <span id="version"></span>
-        </div>
-        <div class="options">
-            <div id="saving" class="invisible">
-                <span id="savingIcon"></span>
-                <span>正在保存...</span>
-            </div>
-            <div class="line">
-                <span>插件展示个数：</span>
+    <nav class="navbar navbar-dark sticky-top bd-navbar">
+        <a href="" class="navbar-brand">
+            <img src="images/icon32.png"> 时间
+        </a>
+        <button id="version" class="btn btn-sm btn-outline-secondary" disabled></button>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-1 bg-light sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="" class="nav-link active">
+                            <i class="icon-desktop"></i>
+                            概览</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="" class="nav-link">
+                            <i class="icon-bar-chart"></i>
+                            历史</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="" class="nav-link">
+                            <i class="icon-cogs"></i>
+                            设置</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="col" id="time-main">
+                <time-dashboard v-if="tab==='time-dashboard'"></time-dashboard>
+                <time-options v-if="tab==='time-options'"></time-options>
+                <time-history v-if="tab==='time-history'"></time-history>
+                <!-- <span>展示个数：</span>
                 <select id="selectShowCounts">
                     <option value="10">10</option>
                     <option value="15">15</option>
                     <option value="20">20</option>
-                </select>
+                </select> -->
             </div>
         </div>
-        <div class="footer"><span>如果您喜欢的话，有问题请反馈给我，我的邮箱：gaopu333@gmail.com</span></div>
     </div>
+
+    <script type="text/javascript" src="js/options.js"></script>
 </body>
+
 </html>

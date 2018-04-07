@@ -1,107 +1,20 @@
-body {
-    background-color: #666666;
-    margin: 0;
+.bd-navbar {
+    background-color: #3C454C;
+}
+
+.sidebar {
     padding: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-
-.main {
-    width: 600px;
-    height: 400px;
-    background-color: #272D33;
-    margin: 100px auto;
-    border: 3px solid rgba(178, 186, 193, 0.6);
-    border-radius: 8px;
+.sidebar a {
+    color: #333;
+    opacity: 0.70;
 }
-
-.head {
-    height: 58px;
-    position: relative;
-    background-color: #3C454C;
-    background-image: url("../images/icon48.png");
-    background-repeat: no-repeat;
-    background-position: 5px center;
+.sidebar .active {
+    font-weight: bold;
+    color: #13b2ad;
+    opacity: 1;
 }
-
-.head span.title{
-    font-size: 40px;
-    line-height: 58px;
-    color: #E4EBF0;
-    margin-left: 58px;
-}
-
-.head span#version {
-	position: absolute;
-    bottom: 5px;
-    right: 5px;
-	color: #82919D;
-	text-shadow: 1px 1px #000;
-}
-
-.main .options {
-	box-sizing: border-box;
-	height: 314px;
-	padding: 15px 29px;
-    color: #A2AEB5;
-    text-shadow: 1px 1px #000;
-    position: relative;
-}
-
-.options .line {
-	line-height: 24px;
-	margin: 0px 0 10px;
-}
-
-.options span {
-	font-size: 16px;
-}
-
-select {
-	width: 100px;
-	height: 24px;
-}
-
-#saving {
-	width: 180px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    vertical-align: middle;
-	background-color: white;
-    position: absolute;
-    left: calc(50% - 90px);
-    top: calc(50% - 30px);
-    border-radius: 3px;
-    text-shadow: none;
-}
-
-#savingIcon {
-    width: 26px;
-    height: 26px;
-    line-height: 60px;
-    display: inline-block;
-    background-image: url("../images/options_saving.gif");
-    background-repeat: no-repeat;
-}
-
-#saving span {
-    vertical-align: middle;
-}
-
-.invisible {
-    display: none;
-}
-
-.footer {
-    height: 28px;
-    background-color: #3C454C;
-    color: #82919D;
-    text-shadow: 1px 1px #000;
-    position: relative;
-}
-
-.footer span {
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
+.sidebar a:hover {
+    font-weight: bold;
+    opacity: 1;
 }
