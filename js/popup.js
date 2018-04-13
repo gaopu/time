@@ -106,8 +106,8 @@ function initOption() {
         },
         tooltip: {
             trigger: 'item',
-            formatter: function(params, ticket, callback) {
-                var tip = params.name + "<br/>" + secondsToTimeStr(params.value) + "(" + params.percent + "%)";
+            formatter: function(params) {
+                var tip = echarts.format.truncateText(params.name, 200) + "<br/>" + secondsToTimeStr(params.value) + "(" + params.percent + "%)";
                 return tip;
             }
         },

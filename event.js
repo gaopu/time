@@ -122,8 +122,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 // 开始计时
 function startTimer(windowId, tabId, url) {
-    // 进入Chrome的内置页面，就不用计时了，停止计时状态
-    if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://" || url.substring(0, 7) === "file://") {
+    //某些页面不需要计时，在此处过滤
+    if (filterUrl(url)) {
         localStorage.removeItem(windowId);
         return;
     }
@@ -301,6 +301,17 @@ function getDateString(millis) {
         return new Date(millis).toLocaleDateString("zh-Hans-CN");
     } else {
         return new Date().toLocaleDateString("zh-Hans-CN");
+    }
+}
+
+function filterUrl(url) {
+    // 进入Chrome的内置页面，就不用计时了，停止计时状态
+    if (url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("file://")) {
+        return true;
+    }
+    // 下载链接类型
+    if (url.startsWith("ed2k://")) {
+        return true;
     }
 }
 
