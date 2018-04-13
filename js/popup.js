@@ -116,7 +116,10 @@ function initOption() {
             left: 'left',
             top: 'middle',
             // 数组内容由series.data中的所有对象的name组成
-            data: []
+            data: [],
+            formatter: function (name) {
+                return echarts.format.truncateText(name, 200);
+            }
         },
         series: [{
             name: '时间',
