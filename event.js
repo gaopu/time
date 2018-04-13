@@ -18,7 +18,7 @@ function init() {
     localStorage["version"] = manifest.version;
 
     // 如果"today"属性不是今天的日期时：设置每个网站的"today"属性为"0"
-    if (localStorage["today"] != new Date().toLocaleDateString()) {
+    if (localStorage["today"] != getDateString()) {
         setTodayZero();
         setTodayDate();
     }
@@ -26,19 +26,19 @@ function init() {
     //有时候窗口计时信息会删除不干净，所以用此方法来删除：遍历所有存储的数据，删除key是纯数字的数据
     var numRegex = /^\d+$/;
     var willDeleteKeyArr = [];
-    for (var i = 0;i < localStorage.length; i++) {
+    for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
         if (numRegex.test(key)) {
             willDeleteKeyArr.push(key);
         }
     }
 
-    willDeleteKeyArr.forEach(function(key) {
+    willDeleteKeyArr.forEach(function (key) {
         localStorage.removeItem(key);
     });
 
     // 填充windowsArr数组
-    chrome.windows.getAll(function(windows) {
+    chrome.windows.getAll(function (windows) {
         for (var i = 0; i < windows.length; i++) {
             var windowId = windows[i].id;
             windowsArr.push(windowId);
@@ -47,14 +47,14 @@ function init() {
 }
 
 // 设置定时器，在第二天凌晨零点触发
-chrome.alarms.create("newDay", { when: new Date(new Date().toLocaleDateString()).getTime() + 86400000 });
+chrome.alarms.create("newDay", { when: new Date(getDateString()).getTime() + 86400000 });
 // alarm处理程序
-chrome.alarms.onAlarm.addListener(function(alarm) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
     // 这里把时间统计一下并存储
     // 表示这是由于新的一天到了而触发
     if (alarm.name == "newDay") {
         // 凌晨零点，获取所有window，将这些窗口的计时状态都存储、更新
-        chrome.windows.getAll(function(windows) {
+        chrome.windows.getAll(function (windows) {
             for (var i = 0; i < windows.length; i++) {
                 var windowId = windows[i].id;
 
@@ -67,13 +67,13 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 
             setTodayZero();
             setTodayDate();
-            chrome.alarms.create("newDay", { when: new Date(new Date().toLocaleDateString()).getTime() + 86400000 });
+            chrome.alarms.create("newDay", { when: new Date(getDateString()).getTime() + 86400000 });
         });
     }
 });
 
-chrome.tabs.onActivated.addListener(function(activeInfo) {
-    chrome.tabs.get(activeInfo.tabId, function(tab) {
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    chrome.tabs.get(activeInfo.tabId, function (tab) {
         var url = tab.url;
 
         if (url == "" || url == null) {
@@ -88,19 +88,13 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             saveTime(windowId);
         }
 
-        // 进入Chrome的内置页面，就不用计时了，停止计时状态
-        if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://" || url.substring(0, 7) === "file://") {
-            localStorage.removeItem(windowId);
-            return;
-        }
-
         // 记录新的计时状态
         startTimer(windowId, tabId, url);
     });
 });
 
 // window关闭时，结束并保存那个window的网站计时
-chrome.windows.onRemoved.addListener(function(windowId) {
+chrome.windows.onRemoved.addListener(function (windowId) {
     saveTime(windowId);
     localStorage.removeItem(windowId);
 
@@ -113,7 +107,7 @@ chrome.windows.onRemoved.addListener(function(windowId) {
 });
 
 // 当tab更新时提醒，检测是否url改变了，改变了就存储上一个网站的计时
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // 这个tab并不是最前端，就不作处理
     if (!tab.active) {
         return;
@@ -122,22 +116,23 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     // url改变了
     if (changeInfo.url != null) {
         saveTime(tab.windowId);
-        if (changeInfo.url.substring(0, 9) === "chrome://" || changeInfo.url.substring(0, 19) === "chrome-extension://" || changeInfo.url.substring(0, 7) === "file://") {
-            localStorage.removeItem(tab.windowId);
-            return;
-        }
-
         startTimer(tab.windowId, tabId, changeInfo.url);
     }
 });
 
 // 开始计时
 function startTimer(windowId, tabId, url) {
+    // 进入Chrome的内置页面，就不用计时了，停止计时状态
+    if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://" || url.substring(0, 7) === "file://") {
+        localStorage.removeItem(windowId);
+        return;
+    }
+
     var domain = extractDomain(url);
     // 此处同时处理了"多个window同时计时同一个网站"的情况
     // 计时开始时：保存一个相同网站的时间，再将所有与此相同的网站的start设置为同一时间
-    chrome.windows.getAll(function(windows) {
-        // 保存一个相同网站的时间
+    chrome.windows.getAll(function (windows) {
+        // 当一个网页在多个窗口中打开时，只计算其中一个的时间并保存
         for (var i = 0; i < windows.length; i++) {
             var wId = windows[i].id;
 
@@ -200,10 +195,13 @@ function saveTime(windowId) {
             }
 
             if (JSON.parse(localStorage[wId]).domain == domain) {
-                var jsonStr = getSaveJsonStr(jsonObj.domain, jsonObj.start);
+                var info = getSaveJsonStr(jsonObj.domain, jsonObj.start);
 
-                if (jsonStr != null) {
-                    localStorage[jsonObj.domain] = jsonStr;
+                if (info != null) {
+                    localStorage[jsonObj.domain] = JSON.stringify({
+                        today: info.today,
+                        all: info.all
+                    });
                 }
                 break;
             }
@@ -225,7 +223,7 @@ function saveTime(windowId) {
     }
 }
 
-// 构造记录网站访问时间的json串，json串中的内容有：
+// 构造记录网站访问时间的对象，对象内容有：
 // all 总共的访问时间
 // today 当日访问时间
 // 时间单位是秒
@@ -233,8 +231,9 @@ function getSaveJsonStr(domain, start) {
     var jsonStr = localStorage[domain];
     var today, all;
 
+    var currentTimeMillis = Date.now();
     // 本次的访问时间
-    var time = parseInt((Date.now() - start) / 1000);
+    var time = parseInt((currentTimeMillis - start) / 1000);
 
     if (time <= 0) {
         return null;
@@ -257,7 +256,10 @@ function getSaveJsonStr(domain, start) {
         all = jsonObj.all + time;
     }
 
-    return '{"today":' + today + ',"all":' + all + '}';
+    return {
+        today,
+        all
+    };
 }
 
 // 将每个网站的今日访问时间"today"更新为0,。
@@ -267,17 +269,16 @@ function setTodayZero() {
         var domainsArr = domainsStr.split(",");
         for (var i = 0; i < domainsArr.length; i++) {
             var domain = domainsArr[i];
-            var domainTimeJsonObj = JSON.parse(localStorage[domain]);
-            var allTime = domainTimeJsonObj.all;
-
-            localStorage[domain] = '{"today":0,"all":' + allTime + '}';
+            var domainObj = JSON.parse(localStorage[domain]);
+            domainObj.today = 0;
+            localStorage[domain] = JSON.stringify(domainObj);
         }
     }
 }
 
 // 设置"today"为今日日期
 function setTodayDate() {
-    localStorage["today"] = new Date().toLocaleDateString();
+    localStorage["today"] = getDateString();
 }
 
 // 构造计时信息的json串，json串中的内容有：
@@ -293,3 +294,30 @@ function extractDomain(url) {
     var re = /:\/\/(www\.)?(.+?)\//;
     return url.match(re)[2];
 }
+
+//返回一个时间，格式：2018/1/25
+function getDateString(millis) {
+    if (millis != null) {
+        return new Date(millis).toLocaleDateString("zh-Hans-CN");
+    } else {
+        return new Date().toLocaleDateString("zh-Hans-CN");
+    }
+}
+
+setInterval(function () {
+    windowsArr.forEach(function (windowId) {
+        chrome.windows.get(windowId, { populate: true }, function callback(window) {
+            // 最小化窗口不计时
+            if (window.state == "minimized") {
+                saveTime(windowId);
+                localStorage.removeItem(windowId);
+            } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
+                window.tabs.forEach(function (tab) {
+                    if (tab.highlighted) {
+                        startTimer(windowId, tab.id, tab.url);
+                    }
+                });
+            }
+        });
+    });
+}, 1000);
