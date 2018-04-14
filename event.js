@@ -99,12 +99,6 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
             saveTime(windowId);
         }
 
-        // 进入Chrome的内置页面，就不用计时了，停止计时状态
-        if (url.substring(0, 9) === "chrome://" || url.substring(0, 19) === "chrome-extension://" || url.substring(0, 7) === "file://") {
-            localStorage.removeItem(windowId);
-            return;
-        }
-
         // 记录新的计时状态
         startTimer(windowId, tabId, url);
     });
@@ -144,6 +138,12 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 // 开始计时
 function startTimer(windowId, tabId, url) {
+    // 某些页面不需要计时，在此处过滤
+    if (filterUrl(url)) {
+        localStorage.removeItem(windowId);
+        return;
+    }
+
     var domain = extractDomain(url);
     // 此处同时处理了"多个window同时计时同一个网站"的情况
     // 计时开始时：保存一个相同网站的时间，再将所有与此相同的网站的start设置为同一时间
@@ -359,3 +359,32 @@ function historyStore(obj) {
     var historyStore = tx.objectStore("historyStore");
     historyStore.put(obj);
 }
+
+function filterUrl(url) {
+    // 进入Chrome的内置页面，就不用计时了，停止计时状态
+    if (url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("file://")) {
+        return true;
+    }
+    // 下载链接类型
+    if (url.startsWith("ed2k://")) {
+        return true;
+    }
+}
+
+setInterval(function () {
+    windowsArr.forEach(function (windowId) {
+        chrome.windows.get(windowId, { populate: true }, function callback(window) {
+            // 最小化窗口不计时
+            if (window.state == "minimized") {
+                saveTime(windowId);
+                localStorage.removeItem(windowId);
+            } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
+                window.tabs.forEach(function (tab) {
+                    if (tab.highlighted) {
+                        startTimer(windowId, tab.id, tab.url);
+                    }
+                });
+            }
+        });
+    });
+}, 1000);

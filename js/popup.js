@@ -106,8 +106,8 @@ function initOption() {
         },
         tooltip: {
             trigger: 'item',
-            formatter: function(params, ticket, callback) {
-                var tip = params.name + "<br/>" + secondsToTimeStr(params.value) + "(" + params.percent + "%)";
+            formatter: function(params) {
+                var tip = echarts.format.truncateText(params.name, 200) + "<br/>" + secondsToTimeStr(params.value) + "(" + params.percent + "%)";
                 return tip;
             }
         },
@@ -116,7 +116,10 @@ function initOption() {
             left: 'left',
             top: 'middle',
             // 数组内容由series.data中的所有对象的name组成
-            data: []
+            data: [],
+            formatter: function (name) {
+                return echarts.format.truncateText(name, 200);
+            }
         },
         series: [{
             name: '时间',
