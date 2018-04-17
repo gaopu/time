@@ -182,6 +182,13 @@ function saveTime(windowId) {
     if (localStorage[windowId] != null) {
         var jsonObj = JSON.parse(localStorage[windowId]);
         var domain = jsonObj.domain;
+        var start = jsonObj.start;
+
+        // 因为每10秒会自动保存一次浏览时间，所以一旦本次计时时间超过10s很多，那么就认为这次计时无效
+        var now = Date.now();
+        if (parseInt((now - start) / 1000) > 20) {
+            jsonObj.start = now;
+        }
 
         // 此处同时处理了"多个window同时计时同一个网站"的情况
         // 计时结束时：保存一个相同的网站的时间，再修改所有与此相同的网站的start为同一时间
@@ -315,20 +322,44 @@ function filterUrl(url) {
     }
 }
 
+// 一些定时循环任务：
+// 1.停止最小化的窗口的计时
+// 2.电脑锁定、休眠时不计时
+setInterval(function () {
+    chrome.idle.queryState(15, function (state) {
+        // 获取电脑是否处于"锁定"或“休眠”状态
+        if (state === 'locked' || state === 'idle') {
+            windowsArr.forEach(function (windowId) {
+                chrome.windows.get(windowId, function callback(window) {
+                    saveTime(windowId);
+                    localStorage.removeItem(windowId);
+                });
+            });
+        } else {
+            windowsArr.forEach(function (windowId) {
+                chrome.windows.get(windowId, { populate: true }, function callback(window) {
+                    // 最小化窗口不计时
+                    if (window.state == "minimized") {
+                        saveTime(windowId);
+                        localStorage.removeItem(windowId);
+                    } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
+                        window.tabs.forEach(function (tab) {
+                            if (tab.highlighted) {
+                                startTimer(windowId, tab.id, tab.url);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    });
+}, 1000);
+
+// 每10秒自动保存一次计时
 setInterval(function () {
     windowsArr.forEach(function (windowId) {
         chrome.windows.get(windowId, { populate: true }, function callback(window) {
-            // 最小化窗口不计时
-            if (window.state == "minimized") {
                 saveTime(windowId);
-                localStorage.removeItem(windowId);
-            } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
-                window.tabs.forEach(function (tab) {
-                    if (tab.highlighted) {
-                        startTimer(windowId, tab.id, tab.url);
-                    }
-                });
-            }
         });
     });
-}, 1000);
+}, 10000);
