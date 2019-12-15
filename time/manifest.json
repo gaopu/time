@@ -3,7 +3,7 @@
 
     "name": "时间",
     "description": "时间都去哪儿了。",
-    "version": "1.18.1.25",
+    "version": "1.19.12",
 
     "icons": {
         "16": "images/icon16.png",
@@ -27,7 +27,7 @@
     },
 
     "background": {
-        "scripts": ["event.js"]
+        "scripts": ["js/inner/tools.js", "js/event.js", "js/inner/db.js", "js/inner/listener.js", "js/inner/timer.js"]
     },
 
     "permissions": [
