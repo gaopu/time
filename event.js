@@ -338,8 +338,8 @@ setInterval(function () {
         } else {
             windowsArr.forEach(function (windowId) {
                 chrome.windows.get(windowId, { populate: true }, function callback(window) {
-                    // 最小化窗口不计时
-                    if (window.state == "minimized") {
+                    // 窗口最小化时、窗口没有聚焦停止计时
+                    if (window.state == "minimized" || window.focused == false) {
                         saveTime(windowId);
                         localStorage.removeItem(windowId);
                     } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
