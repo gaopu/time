@@ -312,6 +312,10 @@ function getDateString(millis) {
 }
 
 function filterUrl(url) {
+    if (url == null || url == "") {
+        return true;
+    }
+
     // 进入Chrome的内置页面，就不用计时了，停止计时状态
     if (url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("file://")) {
         return true;
@@ -326,7 +330,8 @@ function filterUrl(url) {
 // 1.停止最小化的窗口的计时
 // 2.电脑锁定、休眠时不计时
 setInterval(function () {
-    chrome.idle.queryState(15, function (state) {
+    // 一天鼠标都没动，状态会变成idle
+    chrome.idle.queryState(86400, function (state) {
         // 获取电脑是否处于"锁定"或“休眠”状态
         if (state === 'locked' || state === 'idle') {
             windowsArr.forEach(function (windowId) {
