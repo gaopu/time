@@ -64,15 +64,21 @@ function draw(event, flag = "today") {
         }
     });
 
+    // 只显示访问时间前几的网站
     allDomainsObjArr.sort(compare);
     allDomainsObjArr = allDomainsObjArr.slice(0, showCounts);
 
     allDomainsObjArr.forEach(function(item, index, array) {
         option.legend.data.push(item.domain);
-        option.series[0].data.push({ value: item.value, name: item.domain });
+        option.series[0].data.push({ value: item.value, name: item.domain , url: "http://" + item.domain});
     });
 
     myChart.setOption(option);
+
+    // 点击饼图，跳转到对应网站
+    myChart.on("click", function(e) {
+        window.open(e.data.url);
+    });
 }
 
 // 右上角“今日”、“总计”的点击事件处理函数
