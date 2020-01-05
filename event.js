@@ -17,12 +17,6 @@ function init() {
     var manifest = chrome.runtime.getManifest();
     localStorage["version"] = manifest.version;
 
-    // 如果"today"属性不是今天的日期时：设置每个网站的"today"属性为"0"
-    if (localStorage["today"] != getDateString()) {
-        setTodayZero();
-        setTodayDate();
-    }
-
     //有时候窗口计时信息会删除不干净，所以用此方法来删除：遍历所有存储的数据，删除key是纯数字的数据
     var numRegex = /^\d+$/;
     var willDeleteKeyArr = [];
@@ -45,32 +39,6 @@ function init() {
         }
     });
 }
-
-// 设置定时器，在第二天凌晨零点触发
-chrome.alarms.create("newDay", { when: new Date(getDateString()).getTime() + 86400000 });
-// alarm处理程序
-chrome.alarms.onAlarm.addListener(function (alarm) {
-    // 这里把时间统计一下并存储
-    // 表示这是由于新的一天到了而触发
-    if (alarm.name == "newDay") {
-        // 凌晨零点，获取所有window，将这些窗口的计时状态都存储、更新
-        chrome.windows.getAll(function (windows) {
-            for (var i = 0; i < windows.length; i++) {
-                var windowId = windows[i].id;
-
-                if (localStorage[windowId] == null) {
-                    continue;
-                }
-
-                saveTime(windowId);
-            }
-
-            setTodayZero();
-            setTodayDate();
-            chrome.alarms.create("newDay", { when: new Date(getDateString()).getTime() + 86400000 });
-        });
-    }
-});
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.get(activeInfo.tabId, function (tab) {
@@ -183,12 +151,6 @@ function saveTime(windowId) {
         var jsonObj = JSON.parse(localStorage[windowId]);
         var domain = jsonObj.domain;
         var start = jsonObj.start;
-
-        // 因为每10秒会自动保存一次浏览时间，所以一旦本次计时时间超过10s很多，那么就认为这次计时无效
-        var now = Date.now();
-        if (parseInt((now - start) / 1000) > 20) {
-            jsonObj.start = now;
-        }
 
         // 此处同时处理了"多个window同时计时同一个网站"的情况
         // 计时结束时：保存一个相同的网站的时间，再修改所有与此相同的网站的start为同一时间
@@ -326,14 +288,11 @@ function filterUrl(url) {
     }
 }
 
-// 一些定时循环任务：
-// 1.停止最小化的窗口的计时
-// 2.电脑锁定、休眠时不计时
+// 定时循环任务
 setInterval(function () {
     // 一天鼠标都没动，状态会变成idle
     chrome.idle.queryState(86400, function (state) {
-        // 获取电脑是否处于"锁定"或“休眠”状态
-        if (state === 'locked' || state === 'idle') {
+        if (state === 'locked' || state === 'idle') { // 处于"锁定"或“休眠”状态，该停止计时
             windowsArr.forEach(function (windowId) {
                 chrome.windows.get(windowId, function callback(window) {
                     saveTime(windowId);
@@ -343,11 +302,10 @@ setInterval(function () {
         } else {
             windowsArr.forEach(function (windowId) {
                 chrome.windows.get(windowId, { populate: true }, function callback(window) {
-                    // 窗口最小化时、窗口没有聚焦停止计时
-                    if (window.state == "minimized" || window.focused == false) {
+                    if (window.state == "minimized" || window.focused == false) { // 窗口最小化时、窗口没有聚焦，该停止计时
                         saveTime(windowId);
                         localStorage.removeItem(windowId);
-                    } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息
+                    } else if (localStorage[windowId] == null) { // 不是最小化也没有计时信息，该启动计时
                         window.tabs.forEach(function (tab) {
                             if (tab.highlighted) {
                                 startTimer(windowId, tab.id, tab.url);
@@ -358,13 +316,15 @@ setInterval(function () {
             });
         }
     });
-}, 1000);
 
-// 每10秒自动保存一次计时
-setInterval(function () {
+    // 保存时间
     windowsArr.forEach(function (windowId) {
-        chrome.windows.get(windowId, { populate: true }, function callback(window) {
-                saveTime(windowId);
-        });
+        saveTime(windowId);
     });
-}, 10000);
+    
+    // 跨日处理
+    if (localStorage["today"] != getDateString()) {
+        setTodayZero();
+        setTodayDate();
+    }
+}, 1000);
